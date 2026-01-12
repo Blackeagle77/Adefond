@@ -1,0 +1,38 @@
+name: Rapport fondamental quotidien
+
+on:
+  schedule:
+    - cron: "30 7 * * *"   # Tous les jours à 07h30 UTC
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: |
+        pip install requests
+
+    - name: Run script
+      env:
+        MYFXBOOK_EMAIL: ${{ secrets.MYFXBOOK_EMAIL }}
+        MYFXBOOK_PASSWORD: ${{ secrets.MYFXBOOK_PASSWORD }}
+      run: |
+        python main.py
+
+    - name: Commit daily report
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add rapport_*.txt
+        git commit -m "Rapport quotidien du $(date +'%Y-%m-%d')"
+        git push

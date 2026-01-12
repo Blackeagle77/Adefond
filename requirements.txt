@@ -1,0 +1,4 @@
+schedule
+requests
+pandas
+beautifulsoup4
